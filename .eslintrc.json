@@ -21,13 +21,7 @@
         "no-use-before-define": 0,
         "no-tabs": 0,
         "react/prop-types": ["error", { "ignore": ["navigation"] }],
-        "react/jsx-no-bind": [true, {
-            "ignoreDOMComponents": false,
-            "ignoreRefs": false,
-            "allowArrowFunctions": true,
-            "allowFunctions": true,
-            "allowBind": true
-          }]
+        "import/prefer-default-export": 0
     }
 }
 
