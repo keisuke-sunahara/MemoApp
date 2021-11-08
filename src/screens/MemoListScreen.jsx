@@ -9,6 +9,7 @@ import CircleButton from '../components/CircleButton';
 import LogOutButton from '../components/LogOutButton';
 import Button from '../components/Button';
 import Loading from '../components/Loading';
+import HeaderRightButton from '../components/HeaderRightButton';
 
 export default function MemoListScreen(props) {
   const { navigation } = props;
@@ -21,30 +22,48 @@ export default function MemoListScreen(props) {
   }, []);
 
   useEffect(() => {
-    const db = firebase.firestore();
-    const { currentUser } = firebase.auth();
-    let unsubscribe = () => {};
-    if (currentUser) {
-      setLoading(true);
-      const ref = db.collection(`users/${currentUser.uid}/memos`).orderBy('updateAt', 'desc');
-      unsubscribe = ref.onSnapshot((snapshot) => {
-        const userMemos = [];
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          userMemos.push({
-            id: doc.id,
-            bodyText: data.bodyText,
-            updateAt: data.updateAt.toDate(),
+    setLoading(true);
+    const cleanupFuncs = {
+      auth: () => {},
+      memos: () => {},
+    };
+    cleanupFuncs.auth = firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        const db = firebase.firestore();
+        const ref = db.collection(`users/${user.uid}/memos`).orderBy('updateAt', 'desc');
+        cleanupFuncs.memos = ref.onSnapshot((snapshot) => {
+          const userMemos = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            userMemos.push({
+              id: doc.id,
+              bodyText: data.bodyText,
+              updateAt: data.updateAt.toDate(),
+            });
           });
+          setMemos(userMemos);
+          setLoading(false);
+        }, () => {
+          setLoading(false);
         });
-        setMemos(userMemos);
-        setLoading(false);
-      }, () => {
-        setLoading(false);
-        Alert.alert('データの読み込みに失敗しました。');
-      });
-    }
-    return unsubscribe;
+        navigation.setOptions({
+          headerRight: () => (
+            <HeaderRightButton currentUser={user} cleanupFuncs={cleanupFuncs} />
+          ),
+        });
+      } else {
+        // 匿名ログイン
+        firebase.auth().signInAnonymously()
+          .catch(() => {
+            Alert.alert('エラー', 'アプリを再起動してください');
+          })
+          .then(() => { setLoading(false); });
+      }
+    });
+    return () => {
+      cleanupFuncs.auth();
+      cleanupFuncs.memos();
+    };
   }, []);
 
   if (memos.length === 0) {

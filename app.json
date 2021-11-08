@@ -2,7 +2,7 @@
   "expo": {
     "name": "MemoApp",
     "slug": "MemoApp",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "privacy": "unlisted",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -18,9 +18,14 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "jp.MemoApp",
+      "buildNumber": "1.0.1"
     },
     "android": {
+      "package": "jp.MemoApp",
+      "versionCode": 2,
+      "permissions": [],
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon_adaptive_foreground.png",
         "backgroundImage": "./assets/icon_adaptive_background.png"
