@@ -4,10 +4,8 @@ import {
 } from 'react-native';
 import firebase from 'firebase';
 import { useNavigation } from '@react-navigation/native';
-import { func, shape } from 'prop-types';
 
-export default function LogOutButton(props) {
-  const { cleanupFunc } = props;
+export default function LogOutButton() {
   const navigation = useNavigation();
   const handlePress = useCallback(() => {
     Alert.alert('ログアウトします', 'よろしいですか？', [
@@ -18,8 +16,6 @@ export default function LogOutButton(props) {
       {
         text: 'OK',
         onPress: () => {
-          cleanupFunc.memos();
-          cleanupFunc.auth();
           firebase.auth().signOut()
             .then(() => {
               navigation.reset({
@@ -41,13 +37,6 @@ export default function LogOutButton(props) {
     </TouchableOpacity>
   );
 }
-
-LogOutButton.propTypes = {
-  cleanupFunc: shape({
-    auth: func,
-    memos: func,
-  }).isRequired,
-};
 
 const styles = StyleSheet.create({
   container: {
